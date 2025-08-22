@@ -21,23 +21,21 @@ public class ShowSession extends HttpServlet {
         resp.setContentType("text/html; charset=UTF-8");
         PrintWriter out = resp.getWriter();
 
-        HttpSession s = req.getSession(false); // false = không tự tạo mới
-        if (s == null) {
-            // chưa có session → quay lại tạo
-            resp.sendRedirect(req.getContextPath() + "/createsession");
-            return;
-        }
+        HttpSession s = req.getSession(false);
+        if (s == null) { resp.sendRedirect(req.getContextPath() + "/createsession"); return; }
 
         String ten = (String) s.getAttribute("ten");
-        Integer tuoi = (Integer) s.getAttribute("tuoi");
+        Object tuoiObj = s.getAttribute("tuoi");
+        Integer tuoi = (tuoiObj instanceof Integer) ? (Integer)tuoiObj
+                                                    : Integer.valueOf(String.valueOf(tuoiObj));
 
         if (ten == null || tuoi == null) {
-            // chưa có dữ liệu trong session → quay lại tạo
-            resp.sendRedirect(req.getContextPath() + "/createsession");
-            return;
+          resp.sendRedirect(req.getContextPath() + "/createsession");
+          return;
         }
 
         out.println("<h2>Xin chào bạn: " + ten + " - Tuổi: " + tuoi + "</h2>");
-        out.close();
+        out.println("<p>Session ID: " + s.getId() + "</p>");
+
     }
 }
